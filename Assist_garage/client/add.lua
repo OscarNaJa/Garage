@@ -877,7 +877,7 @@ Citizen.CreateThread(function()
                             Config.garageDetail[lastDeleteMarker].deletelocation.z - 0.3
                         )
                         text = 'STORED VEHICLE'
-                        local success = showInteractionUIThrottled("delete_interact", {
+                        showInteractionUIThrottled("delete_interact", {
                             id = Config.garageDetail[lastDeleteMarker].deletelocation,
                             coords = Config.garageDetail[lastDeleteMarker].deletelocation,
                             keyNum = 38,
@@ -887,7 +887,7 @@ Citizen.CreateThread(function()
                             duration = 600,
                             type = 2
                         })
-                        if success and isInteractPressed() then
+                        if isInteractPressed() then
                             -- if GetPedInVehicleSeat(GetVehiclePedIsIn(ped), -1) == ped then
                                 if not fistLoad then
                                     TriggerServerEvent(ResourceName..':reloadData')
@@ -926,7 +926,7 @@ Citizen.CreateThread(function()
                         )
                         -- print(Config.SpawnMarker.x)
                         text = 'OPEN GARAGE'
-                        local success = showInteractionUIThrottled("garage_interact", {
+                        showInteractionUIThrottled("garage_interact", {
                             id = gpos,
                             coords = gpos,
                             keyNum = 38,
@@ -936,7 +936,7 @@ Citizen.CreateThread(function()
                             duration = 600,
                             type = 2
                         })
-                        if success and isInteractPressed() then
+                        if isInteractPressed() then
                             if not fistLoad then
                                 SetNuiFocus(true, true)
                                 TriggerServerEvent(ResourceName..':reloadData')
@@ -983,7 +983,7 @@ Citizen.CreateThread(function()
                             pressE = true
                             mrcoords = vector3(poundConfig.location.x, poundConfig.location.y, poundConfig.location.z - 0.3)
                             text = 'OPEN POUND VEHICLE MENU'
-                            local success = showInteractionUIThrottled("pound_interact", {
+                            showInteractionUIThrottled("pound_interact", {
                                 id = poundConfig.location,
                                 coords = poundConfig.location,
                                 keyNum = 38,
@@ -993,7 +993,7 @@ Citizen.CreateThread(function()
                                 duration = 600,
                                 type = 2
                             })
-                            if success and isInteractPressed() then
+                            if isInteractPressed() then
                                 if not fistLoad then
                                     SetNuiFocus(true, true)
                                     TriggerServerEvent(ResourceName..':reloadData')
@@ -1107,7 +1107,7 @@ CreateThread(function()
                         --     90,false,false,2,false,false,false,false
                         -- )
                         if not cfg.autodelete then
-                            local ok = showInteractionUIThrottled("deposit_store_interact", {
+                            showInteractionUIThrottled("deposit_store_interact", {
                                 id = cfg.deletelocation,
                                 coords = coords,
                                 keyNum = 38,
@@ -1117,7 +1117,7 @@ CreateThread(function()
                                 duration = 600,
                                 type = 2
                             })
-                            if ok and isInteractPressed() then
+                            if isInteractPressed() then
                                 dprint("[Deposit] Success: hold E to deposit")
                                 if not fistLoad then
                                     TriggerServerEvent(ResourceName..':reloadData')
@@ -1152,7 +1152,7 @@ CreateThread(function()
                     dprint("[DimCheck-foot]", isInDimension(getCachedDimension()))
                     if (CurrentPoint == nil) and isInDimension(getCachedDimension()) then
                         sleep = 0
-                        local success = showInteractionUIThrottled("deposit_open_interact", {
+                        showInteractionUIThrottled("deposit_open_interact", {
                             id = cfg.location,
                             coords = cfg.location,
                             keyNum = 38,
@@ -1162,7 +1162,7 @@ CreateThread(function()
                             duration = 600,
                             type = 2
                         })
-                        if success and isInteractPressed() then
+                        if isInteractPressed() then
                             if not fistLoad then
                                 SetNuiFocus(true,true)
                                 TriggerServerEvent(ResourceName..':reloadData')
