@@ -1,7 +1,19 @@
 Config = Config or {}
--- vehicletype = 'car' , 'bike' , 'helicopter'
--- job = true  ถ้าใส่ จะให้เฉพาะคนที่มี job เท่านั้นถึงจะใช้ได้
-Config.PoundMarker 	= { type = 36, r = 255, g = 165, b = 0, a=100, x = 1.5, y = 1.5, z = 1.2 }
+
+-- =========================================================
+-- Pound Location Config
+-- =========================================================
+-- ฟิลด์หลักต่อรายการ:
+--   location / spawnlocation / spawnheading
+--   vehicletype = 'car' | 'bike' | 'helicopter'
+--   Radius / job
+--   Propspawn = { model, heading }
+
+Config.PoundMarker = {
+    type = 36,
+    r = 255, g = 165, b = 0, a = 100,
+    x = 1.5, y = 1.5, z = 1.2,
+}
 
 Config.poundDetail = {
 

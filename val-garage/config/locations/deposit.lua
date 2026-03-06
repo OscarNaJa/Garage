@@ -1,15 +1,29 @@
 Config = Config or {}
 
-Config.DepositMarker1 = { type = 1, r = 200, g = 200, b = 30, x = 3.0, y = 3.0, z = 2.00 }									    
-Config.DepositMarker2 = { type = 28, r = 255, g = 255, b = 255, x = 10.7, y = 10.7, z =10.7 }		--วงใน
--- Config.DepositMarker3 = { type = 28, r = 0, g = 188, b = 255, x = 15.7, y = 15.7, z = 15.7 }		--วงนอก
+-- =========================================================
+-- Deposit Location Config
+-- =========================================================
+-- ฟิลด์หลักต่อรายการ:
+--   Label / GhostZone / active
+--   location / spawnlocation / spawnheading
+--   deletelocation / distDelete / autodelete
+--   Propspawn = { model, heading }
 
--- Config.npc_id = "s_m_m_security_01" -- ped model
+Config.DepositMarker1 = {
+    type = 1,
+    r = 200, g = 200, b = 30,
+    x = 3.0, y = 3.0, z = 2.00,
+}
 
--- Config.npc_anim = {
---     dict = "amb@world_human_cop_idles@idle_b",
---     name = "idle_d"
--- }
+Config.DepositMarker2 = {
+    type = 28,
+    r = 255, g = 255, b = 255,
+    x = 10.7, y = 10.7, z = 10.7,
+} -- วงใน
+
+-- Config.DepositMarker3 = { type = 28, r = 0, g = 188, b = 255, x = 15.7, y = 15.7, z = 15.7 } -- วงนอก
+-- Config.npc_id = "s_m_m_security_01"
+-- Config.npc_anim = { dict = "amb@world_human_cop_idles@idle_b", name = "idle_d" }
 
 Config.depositvehicle = {    
     -- {   

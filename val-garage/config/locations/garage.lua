@@ -1,12 +1,37 @@
 Config = Config or {}
-Config.SpawnMarker 	= { type = 36, r = 94, g = 180, b = 191, a=100, x = 1.85, y = 1.5, z = 1.2 }									-- Marker ของจุดเบิกรถ
-Config.DeleteMarker = { type = 6, r = 255, g = 51, b = 51, a=100, x = 4.0, y = 4.0, z = 0.30 }									    -- Marker ของจุดเก็บรถ (HorizontalSplitArrowCircle)
--- Config.DeleteMarker2 = { type = 36, r = 255, g = 51, b = 51, a=100, x = 1.7, y = 1.7, z = 1.2 }									    -- Marker ของจุดเก็บรถ
 
+-- =========================================================
+-- Garage Location Config
+-- =========================================================
+-- หมายเหตุฟิลด์ที่ใช้บ่อย:
+--   name / labelname  : รหัสและชื่อการาจ
+--   location          : จุดกดเปิดเมนูเบิกรถ
+--   spawnlocation     : จุดสปอนรถ
+--   spawnheading      : หัวรถตอนสปอน
+--   deletelocation    : จุดเก็บรถ
+--   Radius / DelRadius: ระยะใช้งาน marker
+--   vehicletype       : car | boat | helicopter
+--   job               : string หรือ table ของ job ที่อนุญาต
+--   Propspawn         : prop จุดเบิก
+--   Propdelete        : prop จุดเก็บ
 
--- job = { 'police', 'ambulance', 'council' },ถ้าใส่ จะให้เฉพาะคนที่มี job เท่านั้นถึงจะใช้ได้
+Config.SpawnMarker = {
+    type = 36,
+    r = 94, g = 180, b = 191, a = 100,
+    x = 1.85, y = 1.5, z = 1.2
+} -- Marker จุดเบิกรถ
+
+Config.DeleteMarker = {
+    type = 6,
+    r = 255, g = 51, b = 51, a = 100,
+    x = 4.0, y = 4.0, z = 0.30
+} -- Marker จุดเก็บรถ (HorizontalSplitArrowCircle)
+
+-- Config.DeleteMarker2 = { type = 36, r = 255, g = 51, b = 51, a = 100, x = 1.7, y = 1.7, z = 1.2 }
+
+-- job = { 'police', 'ambulance', 'council' } ถ้าใส่ จะให้เฉพาะคนที่มี job ใช้งานได้
 -- deletelocation ไม่ใส่ก็ได้
--- vehicletype = 'car' , 'boat' , 'helicopter'
+-- vehicletype = 'car' | 'boat' | 'helicopter'
 Config.garageDetail = {
 
     -- {   
