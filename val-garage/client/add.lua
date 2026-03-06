@@ -594,13 +594,36 @@ end)
 --     end
 -- end)
 
+local lastMarkerScanAt = 0
+local lastMarkerScanCoords = nil
+
+local function shouldRunMarkerScan(coords, forceInterval, moveThreshold)
+    local now = GetGameTimer()
+    if not lastMarkerScanCoords then
+        lastMarkerScanCoords = coords
+        lastMarkerScanAt = now
+        return true
+    end
+
+    local movedEnough = #(coords - lastMarkerScanCoords) >= (moveThreshold or 3.5)
+    local timedOut = (now - lastMarkerScanAt) >= (forceInterval or 1500)
+    if movedEnough or timedOut then
+        lastMarkerScanCoords = coords
+        lastMarkerScanAt = now
+        return true
+    end
+
+    return false
+end
+
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(500)
-
         local ped = PlayerPedId()
         local playerCoords = GetEntityCoords(ped)
         local veh = GetVehiclePedIsIn(ped, false)
+
+        local hasNearbyContext = hasEnteredGarageMarker or hasEnteredPoundMarker or hasEnteredDeleteMarker or hasEnteredDepositMarker or inGhostZone
+        local loopSleep = hasNearbyContext and 500 or 1200
 
         -- ถ้า lastVeh หายไปจากโลก ให้เคลียร์ ghost ทันที ป้องกันหลอน
         if inGhostZone then
@@ -618,67 +641,72 @@ Citizen.CreateThread(function()
             end
         end
 
-        -- ====== garage ======
-        local currentGarageMarker, garageDistance = GetClosestMarker(playerCoords, locationIndex)
-        if currentGarageMarker and garageDistance < markerRadius then
-            if not hasEnteredGarageMarker then
-                hasEnteredGarageMarker = true
-                lastGarageMarker = currentGarageMarker
-            elseif lastGarageMarker ~= currentGarageMarker then
-                lastGarageMarker = currentGarageMarker
-            end
-        else
-            if hasEnteredGarageMarker then
-                hasEnteredGarageMarker = false
-                lastGarageMarker = nil
-            end
-        end
+        local markerScanInterval = hasNearbyContext and 500 or 2200
+        local canScanMarkers = shouldRunMarkerScan(playerCoords, markerScanInterval, 4.0)
 
-        -- ====== pound ======
-        local currentPoundMarker, poundDistance = GetClosestMarker(playerCoords, poundDetailIndex)
-        if currentPoundMarker and poundDistance < markerRadius then
-            if not hasEnteredPoundMarker then
-                hasEnteredPoundMarker = true
-                lastPoundMarker = currentPoundMarker
-            elseif lastPoundMarker ~= currentPoundMarker then
-                lastPoundMarker = currentPoundMarker
+        if canScanMarkers then
+            -- ====== garage ======
+            local currentGarageMarker, garageDistance = GetClosestMarker(playerCoords, locationIndex)
+            if currentGarageMarker and garageDistance < markerRadius then
+                if not hasEnteredGarageMarker then
+                    hasEnteredGarageMarker = true
+                    lastGarageMarker = currentGarageMarker
+                elseif lastGarageMarker ~= currentGarageMarker then
+                    lastGarageMarker = currentGarageMarker
+                end
+            else
+                if hasEnteredGarageMarker then
+                    hasEnteredGarageMarker = false
+                    lastGarageMarker = nil
+                end
             end
-        else
-            if hasEnteredPoundMarker then
-                hasEnteredPoundMarker = false
-                lastPoundMarker = nil
-            end
-        end
 
-        -- ====== delete location ======
-        local currentDeleteMarker, deleteDistance = GetClosestMarker(playerCoords, deletelocationDetailIndex)
-        if currentDeleteMarker and deleteDistance < markerRadius then
-            if not hasEnteredDeleteMarker then
-                hasEnteredDeleteMarker = true
-                lastDeleteMarker = currentDeleteMarker
-            elseif lastDeleteMarker ~= currentDeleteMarker then
-                lastDeleteMarker = currentDeleteMarker
+            -- ====== pound ======
+            local currentPoundMarker, poundDistance = GetClosestMarker(playerCoords, poundDetailIndex)
+            if currentPoundMarker and poundDistance < markerRadius then
+                if not hasEnteredPoundMarker then
+                    hasEnteredPoundMarker = true
+                    lastPoundMarker = currentPoundMarker
+                elseif lastPoundMarker ~= currentPoundMarker then
+                    lastPoundMarker = currentPoundMarker
+                end
+            else
+                if hasEnteredPoundMarker then
+                    hasEnteredPoundMarker = false
+                    lastPoundMarker = nil
+                end
             end
-        else
-            if hasEnteredDeleteMarker then
-                hasEnteredDeleteMarker = false
-                lastDeleteMarker = nil
-            end
-        end
 
-        -- ====== deposit marker tracking ======
-        local currentDepositMarker, depositDistance = GetClosestMarker(playerCoords, DepositlocationDetailIndex)
-        if currentDepositMarker and depositDistance < 150.0 then
-            if not hasEnteredDepositMarker then
-                hasEnteredDepositMarker = true
-                lastDepositMarker = currentDepositMarker
-            elseif lastDepositMarker ~= currentDepositMarker then
-                lastDepositMarker = currentDepositMarker
+            -- ====== delete location ======
+            local currentDeleteMarker, deleteDistance = GetClosestMarker(playerCoords, deletelocationDetailIndex)
+            if currentDeleteMarker and deleteDistance < markerRadius then
+                if not hasEnteredDeleteMarker then
+                    hasEnteredDeleteMarker = true
+                    lastDeleteMarker = currentDeleteMarker
+                elseif lastDeleteMarker ~= currentDeleteMarker then
+                    lastDeleteMarker = currentDeleteMarker
+                end
+            else
+                if hasEnteredDeleteMarker then
+                    hasEnteredDeleteMarker = false
+                    lastDeleteMarker = nil
+                end
             end
-        else
-            if hasEnteredDepositMarker then
-                hasEnteredDepositMarker = false
-                lastDepositMarker = nil
+
+            -- ====== deposit marker tracking ======
+            local currentDepositMarker, depositDistance = GetClosestMarker(playerCoords, DepositlocationDetailIndex)
+            if currentDepositMarker and depositDistance < 150.0 then
+                if not hasEnteredDepositMarker then
+                    hasEnteredDepositMarker = true
+                    lastDepositMarker = currentDepositMarker
+                elseif lastDepositMarker ~= currentDepositMarker then
+                    lastDepositMarker = currentDepositMarker
+                end
+            else
+                if hasEnteredDepositMarker then
+                    hasEnteredDepositMarker = false
+                    lastDepositMarker = nil
+                end
             end
         end
 
@@ -720,6 +748,8 @@ Citizen.CreateThread(function()
             clearGhostAndAlpha(lastVeh)
             lastVeh = 0
         end
+
+        Citizen.Wait(loopSleep)
     end
 end)
 
