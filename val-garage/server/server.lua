@@ -40,7 +40,7 @@ end
 local function sendWebhook(url, title, description, color)
     if not url or url == '' then return end
     local body = {
-        username = 'Assist_garage',
+        username = 'val-garage',
         embeds = {
             {
                 title = title,

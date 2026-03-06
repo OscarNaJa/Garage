@@ -20,7 +20,7 @@ game 'gta5'
 
 
 client_scripts {
-	'config.lua',
+	'config/main.lua',
    	'source/cl_main.lua',
 	-- '@PolyZone/client.lua',
 	-- '@PolyZone/ComboZone.lua',
@@ -30,7 +30,7 @@ client_scripts {
 
 server_scripts {
 	"@mysql-async/lib/MySQL.lua",
-	'config.lua',
+	'config/main.lua',
 	'source/sv_main.lua',
 }
 
@@ -40,7 +40,6 @@ files {
 	'Interface/main.css',
 	'Interface/main.js',
 	'Interface/ui.html',
-	'Interface/image/*.png',
 	"Interface/sound/*.ogg",
 }
 

@@ -3,12 +3,12 @@ local ESX = exports['es_extended']:getSharedObject()
 local allowedDimensions = Config.DimensionsAllow -- มิติที่ต้องการเช็ค
 local function getCurrentDimension()
     local ok, dim = pcall(function()
-        return exports['Assist_Setdimen']:GetDimension()
+        return exports['val-setdimention']:GetDimension()
     end)
     if ok and dim ~= nil then return dim end
 
     ok, dim = pcall(function()
-        return exports['Assist_Setdimen']:GetCurrentDimension()
+        return exports['val-setdimention']:GetCurrentDimension()
     end)
     if ok and dim ~= nil then return dim end
 
@@ -17,7 +17,7 @@ end
 
 local function getWhitelistDimensions()
     local ok, list = pcall(function()
-        return exports['Assist_Setdimen']:GetWhitelistDimen()
+        return exports['val-setdimention']:GetWhitelistDimen()
     end)
     if ok and type(list) == 'table' then return list end
     return {}
@@ -770,13 +770,13 @@ local function showInteractionUIThrottled(uiKey, payload, intervalMs)
     local item = lastUiCall[uiKey]
     if not item or (now - item) >= interval then
         lastUiCall[uiKey] = now
-        return exports["DTT_3d"]:showInteractionUI(payload)
+        return exports["val-textui"]:showInteractionUI(payload)
     end
     return false
 end
 
 
--- โหมดโปร่งใส/ghost ขณะอยู่ในระยะ UI (DTT_3d)
+-- โหมดโปร่งใส/ghost ขณะอยู่ในระยะ UI (val-textui)
 -- local isGhostActive = false
 -- local ghostVeh = 0         -- รถคันที่กำลังถูกทำให้ใสอยู่
 

@@ -35,7 +35,7 @@ end
 exports('GetWhitelistDimen', GetWhitelistDimen)
 
 -- function isWhitelistedDimension(dim)
---     local WhitelistDimen = exports['Assist_Setdimen']:GetWhitelistDimen()
+--     local WhitelistDimen = exports['val-setdimention']:GetWhitelistDimen()
 --     for _, allowed in ipairs(WhitelistDimen) do
 --         if dim == allowed then
 --             return true
