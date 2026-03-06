@@ -25,23 +25,23 @@ ui_page {
 
 server_scripts {
 	'@mysql-async/lib/MySQL.lua',
-	'config/main.lua',
-	-- 'config/main.lua',
-	'config/pound_detail.lua',
-	'config/garage_detail.lua',
-	'config/deposit_vehicle.lua',
-	'config/vehicle_image.lua',
-	'config/webhook.lua',
+	'config/core/main.lua',
+	-- 'config/core/main.lua',
+	'config/locations/pound.lua',
+	'config/locations/garage.lua',
+	'config/locations/deposit.lua',
+	'config/ui/vehicle_image.lua',
+	'config/core/webhook.lua',
 	'server/server.lua'
 }
 
 client_scripts {
 	'@es_extended/locale.lua',	
-	'config/main.lua',	
-	'config/pound_detail.lua',
-	'config/garage_detail.lua',
-	'config/deposit_vehicle.lua',
-	'config/vehicle_image.lua',
+	'config/core/main.lua',	
+	'config/locations/pound.lua',
+	'config/locations/garage.lua',
+	'config/locations/deposit.lua',
+	'config/ui/vehicle_image.lua',
 	'client/client.lua',
 	'client/add.lua',
 }
