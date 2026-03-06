@@ -1,0 +1,232 @@
+@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+* {
+    user-select: none;
+    padding: 0vh;
+    margin: 0vh;
+    font-family: 'Kanit', sans-serif;
+    color: white;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+body {
+    overflow: hidden;
+    /* background: rgb(85, 85, 85); */
+    /* background: url('./image/bg.png'); */
+}
+
+.container-world {
+    position: absolute;
+    width: 28vh;
+    height: 20vh;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    background: rgb(28, 28, 28, .945);
+    border-radius: 1.4vh;
+}
+
+.world-list {
+    display: flex;
+    flex-direction: row;
+    gap: .5vh;
+}
+
+.world-img {
+    position: absolute;
+    transform: translate(-50%);
+    left: 50%;
+    width: 37.5vh;
+    height: 14vh;
+    top: 3.6vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.world-img>img {
+    width: 100%;
+    object-fit: contain;
+    border-radius: .5vh;
+}
+
+.world-detail {
+    position: absolute;
+    left: 1vh;
+    top: -1.8vh;
+    font-size: 3vh;
+    font-family: "Bebas Neue", sans-serif;
+}
+
+.world-button {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 25vh;
+    height: 3.5vh;
+    background: rgb(62, 62, 62,32%);
+    border: solid .1vw rgb(62, 62, 62,32%);
+    border-radius: .6vh;
+    transform: translate(-50%);
+    left: 50%;
+    bottom: 1.6vh;
+}
+
+.world-button:hover {
+    background: #32b4fd;
+    transition: 300ms;
+}
+
+.world-box {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 6vh;
+    height: 1.9vh;
+    border-radius: .2vh;
+    left: .8vh;
+    font-size: 1.1vh;
+    top: .5vh;
+    font-weight: 500;
+    color: #dedede;
+}
+
+.world-box.active {
+    /* background: #023c5e; */
+    /* border: solid .1vh #00a2ff; */
+}
+/* dropdown positioning for world-list */
+.container-world .world-list {
+    position: absolute;
+    top: 20vh;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgb(28, 28, 28, .945);
+    color: #dedede;
+    border: 0.1vw solid rgb(62, 62, 62, 32%);
+    padding: 0.5vh;
+    border-radius: 0.8vh;
+    display: none;
+    border: none;
+    flex-direction: column;
+    width: 21vh;
+    gap: 0.5vh;
+    z-index: 99;
+    padding-bottom: 1.8vh;
+}
+
+/* style for search input */
+#world_search {
+    width: 100%;
+    padding: 0.7vh 1vh;
+    background: #f77b7b;
+    border: none;
+    outline: none;
+    font-size: 1.2vh;
+    color: white;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-radius: 0.2vh 0.2vh 0 0;
+    margin-bottom: 0.5vh;
+}
+#world_search::placeholder {
+    color: white;
+    opacity: 0.7;
+}
+
+/* world-main select style */
+.world-main {
+    position: relative;
+    top: -0.8vh;
+    font-size: 1.6vh;
+    background: rgb(62, 62, 62,32%);
+    color: #dedede;
+    padding: 0.6vh 1vh;
+    border: 0.1vw solid rgb(62, 62, 62,32%);
+    border-radius: 0.5vh;
+    width: fit-content;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 20vh;
+    font-weight: 500;
+}
+
+.world-main::after {
+    content: "▾";
+    font-size: 2vh;
+    margin-left: 1vh;
+    color: #32b4fd;
+}
+
+/* dropdown box style */
+.world-list {
+    position: absolute;
+    background: white;
+    color: black;
+    padding: 1vh;
+    padding-bottom: 2vh;
+    border: 1px solid #ccc;
+    border-top: none;
+    z-index: 10;
+    max-height: 12vh;
+    overflow-y: auto;
+    display: none;
+    flex-direction: column;
+    min-width: 12vh;
+}
+
+.world-box {
+    color: black;
+    display: flex;
+    justify-content: flex-start;
+    width: 17.3vh;
+    padding: 0.5vh 1vh;
+    cursor: pointer;
+    background: rgb(62, 62, 62, 32%);
+    border: solid .1vh rgb(62, 62, 62, 32%);
+    font-size: 1.2vh;
+}
+
+.world-box:hover,
+.world-box.active {
+    background: rgb(62, 62, 62,.945);
+    border: solid .1vh rgb(62, 62, 62,.945);
+    /* border: solid .1vw rgb(62, 62, 62,.945); */
+}
+
+
+.world-title {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 0.8vh;
+    top: 2vh;
+    left: 1.8vh;
+    font-weight: 500;
+    color: #dedede;
+    font-size: 1.6vh;
+}
+
+.world-title>iconify-icon {
+    background: #032235;
+    border: solid 0.25vh #32b4fd;
+    box-shadow: 0 0 0 .2vh #1A6691;
+    /* box-shadow: 0 0 0vh 0.2vh #32b4fd;
+    filter: drop-shadow(0 0 0.4vh #32b4fd); */
+    border-radius: 50%;
+    width: 2.6vh;
+    height: 2.6vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5vh;
+}
