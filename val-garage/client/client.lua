@@ -49,7 +49,16 @@ local function notifyError()
     })
 end
 
+local lastNotOwnerNotifyAt = 0
+local lastStoreActionAt = 0
+
 local function notifyNotOwner()
+    local now = GetGameTimer()
+    if (now - lastNotOwnerNotifyAt) < 1200 then
+        return
+    end
+    lastNotOwnerNotifyAt = now
+
     exports['ssr_notify']:sendAlert({
         title = 'การาจ',
         msg = 'คุณไม่ใช่เจ้าของรถ',
@@ -907,9 +916,25 @@ AddEventHandler(ResourceName..':SetVehToGarage', function(plate)
 end)
 
 function StoreOwnedVehicleMenu()
+    local now = GetGameTimer()
+    if (now - lastStoreActionAt) < 700 then
+        return
+    end
+    lastStoreActionAt = now
+
 	local playerPed  = PlayerPedId()
 	local vehicle =	GetVehiclePedIsIn(playerPed, false)
+    if vehicle == 0 then
+        CurrentPoint = nil
+        return
+    end
+
 	local vehicleProps  = ESX.Game.GetVehicleProperties(vehicle)
+    if not vehicleProps or not vehicleProps.plate then
+        CurrentPoint = nil
+        return
+    end
+
     if checkOwner(vehicleProps.plate,vehicleProps.model) then
         sendDiscordLog({
             webhook = 'storevehicle',

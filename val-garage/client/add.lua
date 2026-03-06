@@ -790,7 +790,7 @@ function hasJob(jobReq, myJob)
     end
 end
 local function isInteractPressed()
-    return IsControlJustPressed(0, 38) or IsControlJustReleased(0, 38)
+    return IsControlJustPressed(0, 38)
 end
 
 local lastUiCall = {}
