@@ -23,6 +23,25 @@ local function getWhitelistDimensions()
     return {}
 end
 
+local cachedDimension = 0
+local cachedWhitelistDimensions = {}
+
+CreateThread(function()
+    while true do
+        cachedDimension = getCurrentDimension()
+        cachedWhitelistDimensions = getWhitelistDimensions()
+        Wait(500)
+    end
+end)
+
+local function getCachedDimension()
+    return cachedDimension
+end
+
+local function getCachedWhitelistDimensions()
+    return cachedWhitelistDimensions
+end
+
 
 local locationIndex = {}
 local locationPropspawn = {}
@@ -310,7 +329,7 @@ local function DrawGarageCircle(center, radius, colorMarker, colorLine)
             -- กรณีไม่กำหนดสี ปล่อยให้ esx_core ใช้สี default
             exports['esx_core']:drawArenaCircleOnce(center, radius)
         end
-        return
+        return true
     end
 
     if not warnedMissingEsxCoreCircle then
@@ -324,19 +343,20 @@ local function DrawGarageCircle(center, radius, colorMarker, colorLine)
         center.x, center.y, center.z,
         0.0, 0.0, 0.0,
         0.0, 0.0, 0.0,
-        radius * 2.0, radius * 2.0, 0.25,
-        markerColor.r, markerColor.g, markerColor.b, markerColor.a,
+        radius * 2.0, radius * 2.0, 0.12,
+        markerColor.r, markerColor.g, markerColor.b, math.min(markerColor.a, 75),
         false, true, 2, false, nil, nil, false
     )
+    return false
 end
 
--- วาดเฉพาะตอนมีจุดให้วาด + ลดความถี่การวาดลง
+-- วาดเฉพาะ marker ใกล้สุดเพื่อลดวงซ้อนและลดโหลด
 Citizen.CreateThread(function()
     local garageColorMarker = {r = 0, g = 255, b = 0, a = 100}
     local garageColorLine   = {r = 0, g = 255, b = 0, a = 255}
 
     while true do
-        local sleep = 1500
+        local sleep = 900
         local ped    = PlayerPedId()
         local coords = GetEntityCoords(ped)
         local inVeh  = IsPedInAnyVehicle(ped, false)
@@ -345,104 +365,92 @@ Citizen.CreateThread(function()
             (lastGarageMarker ~= nil and not locationPropspawn[lastGarageMarker]) or
             (lastDeleteMarker ~= nil) or
             (lastPoundMarker  ~= nil and not poundPropspawn[lastPoundMarker])
-            -- print(lastDeleteMarker)
-        -- print(deletelocationPropspawn[lastDeleteMarker])
-        -- print(ESX.DumpTable(deletelocationPropspawn[lastDeleteMarker]))
+
         if hasAnyMarker then
             sleep = 0
 
-            -- =======================================
-            -- GARAGE (โชว์เฉพาะจุดที่ไม่มี prop)
-            -- =======================================
-            if not inVeh then
-                for id, location in pairs(locationIndex) do
-                    if location and not locationPropspawn[id] then
-                        local inout, dis = distance(coords, location, 10.0)
-                        if inout then
-                            local cfg = Config.garageDetail[id]
-                            local radius = (cfg and cfg.Radius) or 2.0
-                            local vehicletype = cfg.vehicletype or 'car'
-                            local markerType = Config.MarkerType[vehicletype] or 36
+            if (not inVeh) and lastGarageMarker then
+                local id = lastGarageMarker
+                local location = locationIndex[id]
+                if location and not locationPropspawn[id] then
+                    local inout, dis = distance(coords, location, 10.0)
+                    if inout then
+                        local cfg = Config.garageDetail[id]
+                        local radius = (cfg and cfg.Radius) or 2.0
+                        local vehicletype = cfg.vehicletype or 'car'
+                        local markerType = Config.MarkerType[vehicletype] or 36
+                        DrawGarageCircle(location - vec3(0, 0, 0.5), radius, garageColorMarker, garageColorLine)
 
-                            DrawGarageCircle(location - vec3(0, 0, 0.5), radius, garageColorMarker, garageColorLine)
-                            if dis <= radius then
-                                DrawMarker(
-                                    markerType,
-                                    location.x, location.y, location.z,
-                                    0.0, 0.0, 0.0,
-                                    0.0, 0.0, 0.0,
-                                    1.0, 1.0, 1.0,
-                                    garageColorMarker.r, garageColorMarker.g, garageColorMarker.b,
-                                    garageColorMarker.a * 3,
-                                    true, true, 2, false, nil, nil, false
-                                )
-                            end
+                        if dis <= radius then
+                            DrawMarker(
+                                markerType,
+                                location.x, location.y, location.z,
+                                0.0, 0.0, 0.0,
+                                0.0, 0.0, 0.0,
+                                1.0, 1.0, 1.0,
+                                garageColorMarker.r, garageColorMarker.g, garageColorMarker.b,
+                                garageColorMarker.a * 3,
+                                true, true, 2, false, nil, nil, false
+                            )
                         end
                     end
                 end
             end
 
-            -- =======================================
-            -- DELETE (โชว์ทุกจุดเก็บรถ)
-            -- =======================================
-            if inVeh then
-                for id, location in pairs(deletelocationDetailIndex) do
-                    if location then
-                        local inout, dis = distance(coords, location, 10.0)
-                        if inout then
-                            local cfg = Config.garageDetail[id]
-                            local radius = (cfg and cfg.DelRadius) or Config.DeleteMarker.x or 2.0
-                            -- print("radius:", radius)
-                            local markerType = Config.DeleteMarker.type or 6
-                            local colorMarker = {r = Config.DeleteMarker.r, g = Config.DeleteMarker.g, b = Config.DeleteMarker.b, a = 100}
-                            local colorLine   = {r = Config.DeleteMarker.r, g = Config.DeleteMarker.g, b = Config.DeleteMarker.b, a = 255}
+            if inVeh and lastDeleteMarker then
+                local id = lastDeleteMarker
+                local location = deletelocationDetailIndex[id]
+                if location then
+                    local inout, dis = distance(coords, location, 10.0)
+                    if inout then
+                        local cfg = Config.garageDetail[id]
+                        local radius = (cfg and cfg.DelRadius) or Config.DeleteMarker.x or 2.0
+                        local markerType = Config.DeleteMarker.type or 6
+                        local colorMarker = {r = Config.DeleteMarker.r, g = Config.DeleteMarker.g, b = Config.DeleteMarker.b, a = 100}
+                        local colorLine   = {r = Config.DeleteMarker.r, g = Config.DeleteMarker.g, b = Config.DeleteMarker.b, a = 255}
 
-                            DrawGarageCircle(location - vec3(0, 0, 0.5), radius, colorMarker, colorLine)
-                            if dis <= radius then
-                                DrawMarker(
-                                    markerType,
-                                    location.x, location.y, location.z,
-                                    0.0, 0.0, 0.0,
-                                    0.0, 0.0, 0.0,
-                                    radius, radius, Config.DeleteMarker.z or 0.30,
-                                    255, 51, 51,
-                                    math.min((Config.DeleteMarker.a or 100) * 2, 255),
-                                    false, true, 2, false, nil, nil, false
-                                )
-                            end
+                        local drewEsxCircle = DrawGarageCircle(location - vec3(0, 0, 0.5), radius, colorMarker, colorLine)
+                        if drewEsxCircle and dis <= radius then
+                            DrawMarker(
+                                markerType,
+                                location.x, location.y, location.z,
+                                0.0, 0.0, 0.0,
+                                0.0, 0.0, 0.0,
+                                radius, radius, Config.DeleteMarker.z or 0.30,
+                                255, 51, 51,
+                                math.min((Config.DeleteMarker.a or 100) * 2, 255),
+                                false, true, 2, false, nil, nil, false
+                            )
                         end
                     end
                 end
             end
 
-            -- =======================================
-            -- POUND (โชว์เฉพาะจุดที่ไม่มี prop)
-            -- =======================================
-            if not inVeh then
-                for id, location in pairs(poundDetailIndex) do
-                    if location and not poundPropspawn[id] then
-                        local inout, dis = distance(coords, location, 10.0)
-                        if inout then
-                            local cfg = Config.poundDetail[id]
-                            local radius = (cfg and cfg.Radius) or 1.5
-                            local vehicletype = cfg.vehicletype or 'car'
-                            local markerType = Config.MarkerType[vehicletype] or 36
-                            local colorMarker = {r = Config.PoundMarker.r, g = Config.PoundMarker.g, b = Config.PoundMarker.b, a = 100}
-                            local colorLine   = {r = Config.PoundMarker.r, g = Config.PoundMarker.g, b = Config.PoundMarker.b, a = 255}
+            if (not inVeh) and lastPoundMarker then
+                local id = lastPoundMarker
+                local location = poundDetailIndex[id]
+                if location and not poundPropspawn[id] then
+                    local inout, dis = distance(coords, location, 10.0)
+                    if inout then
+                        local cfg = Config.poundDetail[id]
+                        local radius = (cfg and cfg.Radius) or 1.5
+                        local vehicletype = cfg.vehicletype or 'car'
+                        local markerType = Config.MarkerType[vehicletype] or 36
+                        local colorMarker = {r = Config.PoundMarker.r, g = Config.PoundMarker.g, b = Config.PoundMarker.b, a = 100}
+                        local colorLine   = {r = Config.PoundMarker.r, g = Config.PoundMarker.g, b = Config.PoundMarker.b, a = 255}
 
-                            DrawGarageCircle(location - vec3(0, 0, 0.5), radius, colorMarker, colorLine)
-                            if dis <= radius then
-                                DrawMarker(
-                                    markerType,
-                                    location.x, location.y, location.z,
-                                    0.0, 0.0, 0.0,
-                                    0.0, 0.0, 0.0,
-                                    1.0, 1.0, 1.0,
-                                    colorMarker.r, colorMarker.g, colorMarker.b,
-                                    colorMarker.a * 3,
-                                    true, true, 2, false, nil, nil, false
-                                )
-                            end
+                        DrawGarageCircle(location - vec3(0, 0, 0.5), radius, colorMarker, colorLine)
+                        if dis <= radius then
+                            DrawMarker(
+                                markerType,
+                                location.x, location.y, location.z,
+                                0.0, 0.0, 0.0,
+                                0.0, 0.0, 0.0,
+                                1.0, 1.0, 1.0,
+                                colorMarker.r, colorMarker.g, colorMarker.b,
+                                colorMarker.a * 3,
+                                true, true, 2, false, nil, nil, false
+                            )
                         end
                     end
                 end
@@ -675,7 +683,7 @@ Citizen.CreateThread(function()
         end
 
         -- ====== spawn zone ghost logic (กันรถเบิกรถซ้อนกัน) ======
-        local mydimen = getCurrentDimension()
+        local mydimen = getCachedDimension()
         local inGhostRange = (not isStoryDimension(mydimen)) and isInSpawnGhostRange(playerCoords)
         local hasTrackedVeh = (lastVeh ~= 0 and DoesEntityExist(lastVeh))
         local shouldGhost = inGhostRange and ((veh ~= 0) or hasTrackedVeh)
@@ -727,8 +735,8 @@ end
 function isInDimension(dim)
     for _, v in ipairs(allowedDimensions) do
         dprint("[DimCheck]", v, dim)
-        if v == dim then 
-            return true 
+        if v == dim then
+            return true
         end
     end
     return false
@@ -753,6 +761,18 @@ function hasJob(jobReq, myJob)
 end
 local function isInteractPressed()
     return IsControlJustPressed(0, 38) or IsControlJustReleased(0, 38)
+end
+
+local lastUiCall = {}
+local function showInteractionUIThrottled(uiKey, payload, intervalMs)
+    local now = GetGameTimer()
+    local interval = intervalMs or 120
+    local item = lastUiCall[uiKey]
+    if not item or (now - item) >= interval then
+        lastUiCall[uiKey] = now
+        return exports["DTT_3d"]:showInteractionUI(payload)
+    end
+    return false
 end
 
 
@@ -837,7 +857,7 @@ Citizen.CreateThread(function()
                     local myJob = (PlayerData and PlayerData.job and PlayerData.job.name) or nil
                     local reqJob = Config.garageDetail[lastDeleteMarker].job
                     local delradius = Config.garageDetail[lastDeleteMarker].DelRadius or Config.DeleteMarker.x
-                    if Vdist(coords, Config.garageDetail[lastDeleteMarker].deletelocation) <= delradius and CurrentPoint == nil and isInDimension(getCurrentDimension()) and not openuigarage then
+                    if Vdist(coords, Config.garageDetail[lastDeleteMarker].deletelocation) <= delradius and CurrentPoint == nil and isInDimension(getCachedDimension()) and not openuigarage then
 
                         if not hasJob(reqJob, myJob) then
                             goto END
@@ -857,7 +877,7 @@ Citizen.CreateThread(function()
                             Config.garageDetail[lastDeleteMarker].deletelocation.z - 0.3
                         )
                         text = 'STORED VEHICLE'
-                        local success = exports["DTT_3d"]:showInteractionUI({
+                        local success = showInteractionUIThrottled("delete_interact", {
                             id = Config.garageDetail[lastDeleteMarker].deletelocation,
                             coords = Config.garageDetail[lastDeleteMarker].deletelocation,
                             keyNum = 38,
@@ -894,8 +914,8 @@ Citizen.CreateThread(function()
                     local gcfg   = Config.garageDetail[lastGarageMarker]
                     local gpos   = gcfg.location
                     local gradius= gcfg.Radius or Config.SpawnMarker.x  -- 👈 ดึงจากจุด
-                    if Vdist(coords, gpos) <= gradius and CurrentPoint == nil and isInDimension(getCurrentDimension()) and not openuigarage then
-                        
+                    if Vdist(coords, gpos) <= gradius and CurrentPoint == nil and isInDimension(getCachedDimension()) and not openuigarage then
+
                         if not hasJob(reqJob, myJob) then goto END end
 
                         pressE = true
@@ -906,7 +926,7 @@ Citizen.CreateThread(function()
                         )
                         -- print(Config.SpawnMarker.x)
                         text = 'OPEN GARAGE'
-                        local success = exports["DTT_3d"]:showInteractionUI({
+                        local success = showInteractionUIThrottled("garage_interact", {
                             id = gpos,
                             coords = gpos,
                             keyNum = 38,
@@ -959,11 +979,11 @@ Citizen.CreateThread(function()
                 if hasJob(reqJob, myJob) then
                     if Vdist(coords, poundConfig.location) <= Config.SeeMarker * 1.5 then
                         sleep = 0
-                        if Vdist(coords, poundConfig.location) <= pradius and CurrentPoint == nil and isInDimension(getCurrentDimension()) and not openuigarage then
+                        if Vdist(coords, poundConfig.location) <= pradius and CurrentPoint == nil and isInDimension(getCachedDimension()) and not openuigarage then
                             pressE = true
                             mrcoords = vector3(poundConfig.location.x, poundConfig.location.y, poundConfig.location.z - 0.3)
                             text = 'OPEN POUND VEHICLE MENU'
-                            local success = exports["DTT_3d"]:showInteractionUI({
+                            local success = showInteractionUIThrottled("pound_interact", {
                                 id = poundConfig.location,
                                 coords = poundConfig.location,
                                 keyNum = 38,
@@ -1049,7 +1069,7 @@ end
 exports("OpenGarageNear", OpenGarageNear)
 
 function isStoryDimension(dim)
-    local WhitelistDimen = getWhitelistDimensions()
+    local WhitelistDimen = getCachedWhitelistDimensions()
     for _, allowed in ipairs(WhitelistDimen) do
         if dim == allowed then
             return true
@@ -1059,7 +1079,7 @@ function isStoryDimension(dim)
 end
 
 CreateThread(function()
-    while true do 
+    while true do
         local sleep = 1100
         local ped   = PlayerPedId()
         local coords= GetEntityCoords(ped)
@@ -1074,9 +1094,9 @@ CreateThread(function()
                     local inside = dist <= cfg.distDelete and (CurrentPoint == nil)
                     local veh = GetVehiclePedIsIn(ped, false)
                     local isDriver = (GetPedInVehicleSeat(veh, -1) == ped)
-                    local mydimen = getCurrentDimension()
-                       
-                    if inside and isInDimension(getCurrentDimension()) and not openuigarage and isDriver and not isStoryDimension(mydimen) then
+                    local mydimen = getCachedDimension()
+
+                    if inside and isInDimension(getCachedDimension()) and not openuigarage and isDriver and not isStoryDimension(mydimen) then
                         sleep = 0
                         -- DrawMarker(
                         --     Config.DepositMarker2.type,
@@ -1087,7 +1107,7 @@ CreateThread(function()
                         --     90,false,false,2,false,false,false,false
                         -- )
                         if not cfg.autodelete then
-                            local ok = exports["DTT_3d"]:showInteractionUI({
+                            local ok = showInteractionUIThrottled("deposit_store_interact", {
                                 id = cfg.deletelocation,
                                 coords = coords,
                                 keyNum = 38,
@@ -1099,24 +1119,24 @@ CreateThread(function()
                             })
                             if ok and isInteractPressed() then
                                 dprint("[Deposit] Success: hold E to deposit")
-                                if not fistLoad then 
+                                if not fistLoad then
                                     TriggerServerEvent(ResourceName..':reloadData')
-                                    while not fistLoad do Wait(0) end 
-                                end 
+                                    while not fistLoad do Wait(0) end
+                                end
                                 CurrentPoint = 'deposit'
                                 this_GaragePoint = cfg.location
-                                this_GarageHeading = cfg.spawnheading    
+                                this_GarageHeading = cfg.spawnheading
                                 StoreVehicle_deposit(idx)
                             end
                         else
                             if not isStoryDimension(mydimen) then
-                                if not fistLoad then 
+                                if not fistLoad then
                                     TriggerServerEvent(ResourceName..':reloadData')
-                                    while not fistLoad do Wait(0) end 
-                                end 
+                                    while not fistLoad do Wait(0) end
+                                end
                                 CurrentPoint = 'deposit'
                                 this_GaragePoint = cfg.location
-                                this_GarageHeading = cfg.spawnheading    
+                                this_GarageHeading = cfg.spawnheading
                                 StoreVehicle_deposit(idx)
                             end
                         end
@@ -1129,10 +1149,10 @@ CreateThread(function()
                 local dist = #(coords - cfg.location)
                 if dist <= Config.DepositMarker1.x and not openuigarage then
                     sleep = 200
-                    dprint("[DimCheck-foot]", isInDimension(getCurrentDimension()))
-                    if (CurrentPoint == nil) and isInDimension(getCurrentDimension()) then
+                    dprint("[DimCheck-foot]", isInDimension(getCachedDimension()))
+                    if (CurrentPoint == nil) and isInDimension(getCachedDimension()) then
                         sleep = 0
-                        local success = exports["DTT_3d"]:showInteractionUI({
+                        local success = showInteractionUIThrottled("deposit_open_interact", {
                             id = cfg.location,
                             coords = cfg.location,
                             keyNum = 38,
