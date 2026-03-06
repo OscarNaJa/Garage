@@ -1,23 +1,6 @@
-shared_script "@bt_defender/module/shared.lua"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 fx_version 'adamant'
 
 game 'gta5'
-
 
 client_scripts {
 	'config/core/main.lua',

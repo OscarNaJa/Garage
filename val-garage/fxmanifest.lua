@@ -1,6 +1,3 @@
-shared_script "@bt_defender/module/shared.lua"
-
-
 fx_version 'cerulean'
 
 game 'gta5'

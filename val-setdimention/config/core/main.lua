@@ -1,6 +1,13 @@
-Config = {}
+Config = Config or {}
 
-Config.DebugZone = false  -- true = แสดงวงกลมโซน, false = ไม่แสดง
+-- ==========================================
+-- val-setdimention : Core Config
+-- ==========================================
+-- DebugZone = true  -> แสดงวงช่วยดูระยะโซน
+-- DebugZone = false -> โหมดใช้งานจริง
+Config.DebugZone = false
+
+-- รายการโซนมิติทั้งหมด
 Config.Dimensions = {
     {
         text = 'MINER',  --ห้ามซ้ำกัน
