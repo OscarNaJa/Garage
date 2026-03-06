@@ -4,6 +4,9 @@
 local ESX = exports["es_extended"]:getSharedObject()
 local resourceName = GetCurrentResourceName()
 
+Config = Config or {}
+Config.Dimensions = Config.Dimensions or {}
+
 -- เก็บมิติปัจจุบันฝั่ง Client (เพื่ออ้างอิงภายใน UI/เงื่อนไข)
 local Mydime = 0
 local Myzone = nil
@@ -272,7 +275,7 @@ CreateThread(function()
         -- 🔍 เช็คว่า tick นี้เราเข้า "ระยะกด" โซนไหนหรือไม่
         local inPressRange = false
 
-        for _, zone in ipairs(Config.Dimensions) do
+        for _, zone in ipairs(Config.Dimensions or {}) do
             local distance = #(pCoords - zone.coord)
             -- ============ สตรีม Prop ตามระยะ ============
             if zone.Prop and zone.Prop.model then

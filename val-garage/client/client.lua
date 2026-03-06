@@ -1,3 +1,9 @@
+Config = Config or {}
+Config.garageDetail = Config.garageDetail or {}
+Config.poundDetail = Config.poundDetail or {}
+Config.depositvehicle = Config.depositvehicle or {}
+Config.VehicleImageMap = Config.VehicleImageMap or {}
+
 -- ===========================
 -- Debug helper (wrap ทุก print)
 -- ===========================

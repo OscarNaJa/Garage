@@ -1,5 +1,12 @@
 local ResourceName = GetCurrentResourceName()
 local ESX = exports['es_extended']:getSharedObject()
+
+Config = Config or {}
+Config.DimensionsAllow = Config.DimensionsAllow or {0}
+Config.garageDetail = Config.garageDetail or {}
+Config.poundDetail = Config.poundDetail or {}
+Config.depositvehicle = Config.depositvehicle or {}
+
 local allowedDimensions = Config.DimensionsAllow -- มิติที่ต้องการเช็ค
 local function getCurrentDimension()
     local ok, dim = pcall(function()
