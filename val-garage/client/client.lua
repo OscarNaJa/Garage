@@ -1188,8 +1188,8 @@ RegisterNUICallback('spawnvehicle', function(data,cb)
                     TriggerEvent("mythic_progbar:client:progress", {
                         duration = 3000,
                         useWhileDead = true,
-                        canCancel = false,
-                        label = '',
+                        canCancel = true,
+                        label = 'กำลังเบิกรถ... (กด X เพื่อยกเลิก)',
                         controlDisables = {
                             disableMovement = true,
                             disableCarMovement = true,
@@ -1212,6 +1212,8 @@ RegisterNUICallback('spawnvehicle', function(data,cb)
                                 fuel = math.floor((damage.fuel or 0) + 0.5)
                             })
                             dprint(("[garage] spawnvehicle (pound) -> %s"):format(tableData.plate))
+                        else
+                            TriggerEvent('pNotify:SendNotification', { type = 'error', text = 'ยกเลิกการเบิกรถแล้ว' })
                         end
                     end,'none')
                 else 
@@ -1233,8 +1235,8 @@ RegisterNUICallback('spawnvehicle', function(data,cb)
             TriggerEvent("mythic_progbar:client:progress", {
                 duration = 3000,
                 useWhileDead = true,
-                canCancel = false,
-                label = '',
+                canCancel = true,
+                label = 'กำลังเบิกรถ... (กด X เพื่อยกเลิก)',
                 controlDisables = {
                     disableMovement = true,
                     disableCarMovement = true,
@@ -1266,7 +1268,8 @@ RegisterNUICallback('spawnvehicle', function(data,cb)
                         fuel = math.floor((damage.fuel or 0) + 0.5)
                     })
                     dprint(("[garage] spawnvehicle (deposit-out) -> %s"):format(tableData.plate))
-                
+                else
+                    TriggerEvent('pNotify:SendNotification', { type = 'error', text = 'ยกเลิกการเบิกรถแล้ว' })
                 end
             end,'none')
 
@@ -1280,8 +1283,8 @@ RegisterNUICallback('spawnvehicle', function(data,cb)
             TriggerEvent("mythic_progbar:client:progress", {
                 duration = 3000,
                 useWhileDead = true,
-                canCancel = false,
-                label = '',
+                canCancel = true,
+                label = 'กำลังเบิกรถ... (กด X เพื่อยกเลิก)',
                 controlDisables = {
                     disableMovement = true,
                     disableCarMovement = true,
@@ -1301,6 +1304,8 @@ RegisterNUICallback('spawnvehicle', function(data,cb)
                         durability = math.floor(damage.engine or 0),
                         fuel = math.floor((damage.fuel or 0) + 0.5)
                     })
+                else
+                    TriggerEvent('pNotify:SendNotification', { type = 'error', text = 'ยกเลิกการเบิกรถแล้ว' })
                 end
             end,'none')
         end 
