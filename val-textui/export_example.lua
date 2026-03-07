@@ -1,5 +1,5 @@
 -- ตัวอย่างการใช้งาน export แบบใหม่
--- ใช้งานจาก resource อื่น: exports['DTT_3d']:showInteractionUI({...})
+-- ใช้งานจาก resource อื่น: exports['val-textui']:showInteractionUI({...})
 
 CreateThread(function()
     Wait(1000)
@@ -7,7 +7,7 @@ CreateThread(function()
     local ped = PlayerPedId()
     local coords = GetEntityCoords(ped)
 
-    exports['DTT_3d']:showInteractionUI({
+    exports['val-textui']:showInteractionUI({
         id = 'example_interaction_1',
         coords = coords,
         keyNum = 38,
@@ -20,5 +20,5 @@ CreateThread(function()
 
     -- ลบเองก่อนหมดเวลา (ไม่ใส่ก็ได้เพราะมี duration)
     Wait(3000)
-    exports['DTT_3d']:hideInteractionUI('example_interaction_1')
+    exports['val-textui']:hideInteractionUI('example_interaction_1')
 end)

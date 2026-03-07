@@ -1,26 +1,9 @@
-shared_script "@bt_defender/module/shared.lua"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 fx_version 'adamant'
 
 game 'gta5'
 
-
 client_scripts {
-	'config.lua',
+	'config/core/main.lua',
    	'source/cl_main.lua',
 	-- '@PolyZone/client.lua',
 	-- '@PolyZone/ComboZone.lua',
@@ -30,7 +13,7 @@ client_scripts {
 
 server_scripts {
 	"@mysql-async/lib/MySQL.lua",
-	'config.lua',
+	'config/core/main.lua',
 	'source/sv_main.lua',
 }
 
@@ -40,7 +23,6 @@ files {
 	'Interface/main.css',
 	'Interface/main.js',
 	'Interface/ui.html',
-	'Interface/image/*.png',
 	"Interface/sound/*.ogg",
 }
 
